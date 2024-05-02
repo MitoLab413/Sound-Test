@@ -10,6 +10,14 @@
 </head>
 
 <body>
+    <div class="overlay">
+        <div class="btn_area">
+            <p class="ttl">重要なお知らせ</p>
+            <p>本システムはラジオ体操学習支援サイトです</br>
+            </p>
+            <button>ラジ体操を始める</button>
+        </div>
+    </div>
   <div class="container">
     <video hidden class="input_video"></video><!--入力映像-->
     <canvas class="output_canvas" width="1280px" height="720px"></canvas> <!--描画するキャンパス-->
@@ -18,6 +26,14 @@
   </div>
 </body>
 <style>
+    .overlay {
+            display: none;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            position: fixed;
+            z-index: 1
+        }
   .container{
     display: flex;
     max-width: 1200px;
@@ -42,15 +58,56 @@
     //const grid = new LandmarkGrid(landmarkContainer);
     const angleElement = document.getElementById("angle");
 
+
+    $(function () {
+            $(".overlay").show();
+            $(".btn_area button").click(function () {
+                $(".overlay").fadeOut();
+                //document.documentElement.requestFullscreen();
+                allowMusic();
+            });
+        });
+
+
     //効果音
-    const SE = {
-      ongen:new Audio('ongen.mp3'),
-    };
+    const ongen = new Audio('ongen.mp3');
 
     //効果音を管理するための変数
-    var ongen_sound = false;
-    var arms_cross_sound = false;
-    var knee_bent_sound = false;
+    const nowPlay = ongen;
+    var flagMusic = false;
+
+    const resetMusic = (nowPlay) => {
+            if (flgMusic) nowPlay.pause();
+            nowPlay.currentTime = 0;
+        }
+        /**
+         * 音楽の関数
+         */
+        const stopMusic =()=> {
+            if (flgMusic) nowPlay.pause();
+            flgMusic = false;
+        }
+        /**
+         * 音楽の関数
+         */
+        const allowMusic = () => {
+            if (!flgMusic) nowPlay.play();
+            flgMusic = true;
+        }
+        /**
+         * 音楽の関数
+         * @param {HTMLAudioElement} music
+         * @param {boolean} status
+         */
+        const startMusic = (music, status = false) => {
+            if (flgMusic) {
+                nowPlay.pause();
+                music.currentTime = 0;
+                music.loop = status;
+                music.play();
+                nowPlay = music;
+            }
+        }
 
     //pose1とpose2からベクトルを作る関数
     function makeVector(pose1,pose2){//始点,終点
