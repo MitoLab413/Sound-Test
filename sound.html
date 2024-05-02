@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils_3d/control_utils_3d.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+  <div class="container">
+    <video hidden class="input_video"></video><!--入力映像-->
+    <canvas class="output_canvas" width="1280px" height="720px"></canvas> <!--描画するキャンパス-->
+    <!--<div class="landmark-grid-container"></div>-->
+    <div id="angle"></div><!--体の角度とかの出力先-->
+  </div>
+</body>
+<style>
+  .container{
+    display: flex;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .input_video{
+    width: 72%;
+    height:510px;
+  }
+  .output_canvas{
+    width: 72%;
+    height:510px;
+  }
+  </style>
+</html>
+
+<script type="module">
+    const videoElement = document.getElementsByClassName('input_video')[0];
+    const canvasElement = document.getElementsByClassName('output_canvas')[0];
+    const canvasCtx = canvasElement.getContext('2d');
+    const landmarkContainer = document.getElementsByClassName('landmark-grid-container')[0];
+    //const grid = new LandmarkGrid(landmarkContainer);
+    const angleElement = document.getElementById("angle");
+
+    //効果音
+    const SE = {
+      ongen:new Audio('ongen.mp3'),
+    };
+
+    //効果音を管理するための変数
+    var ongen_sound = false;
+    var arms_cross_sound = false;
+    var knee_bent_sound = false;
+
+    //pose1とpose2からベクトルを作る関数
+    function makeVector(pose1,pose2){//始点,終点
+      const vector1 = {
+          x:Math.round((pose2.x-pose1.x)*1000000)/1000000,
+          y:Math.round((pose2.y-pose1.y)*1000000)/1000000,
+          z:Math.round((pose2.z-pose1.z)*1000000)/1000000,
+          visibility:Math.min(pose1.visibility,pose2.visibility),
+      }
+      return vector1;
+    }
+
+    //肩の角度から体の傾きを計算する関数
+    function bodyAngle(results){
+      var pL = results.poseWorldLandmarks;
+      var rh = POSE_LANDMARKS.RIGHT_ANKLE;
+      var lh = POSE_LANDMARKS.LEFT_ANKLE;
+      var vec = [pL[rh].x-pL[lh].x,pL[rh].y-pL[lh].y,pL[rh].z-pL[lh].z];
+      var vec_long = vec[0]**2+vec[1]**2+vec[2]**2;
+      var costh = -1*vec[2]/Math.sqrt(vec_long);
+      var sign;
+      if(pL[rh].z<=pL[lh].z){
+        sign = 1;
+      }else{
+        sign = -1;
+      }
+      return sign*Math.round(Math.acos(costh)*180/Math.PI*1000)/1000;
+    }
+
+    function cameraAngle(results) {
+    var pL = results.poseWorldLandmarks;
+    var rh = POSE_LANDMARKS.RIGHT_KNEE;
+    var lh = POSE_LANDMARKS.LEFT_KNEE;
+    var vec = [pL[rh].x - pL[lh].x, pL[rh].y - pL[lh].y, pL[rh].z - pL[lh].z];
+    var vec_long = Math.sqrt(vec[0] ** 2 + vec[1] ** 2 + vec[2] ** 2);
+    var costh = vec[2] / vec_long; // Cosine of the angle between the vector and the vertical plane
+    var angleRad = Math.acos(costh); // Angle in radians between the vector and the vertical plane
+    var angleDeg = angleRad * (180 / Math.PI); // Convert radians to degrees
+    return Math.round(angleDeg * 1000) / 1000; // Round to 3 decimal places and return
+}
+
+    //キーポイントを引数とした角度の計算
+    function calcAngle(pose1,pose2,pose3){
+        // please learn here -> https://npm.runkit.com/%40mediapipe%2Fpose
+
+        const vector1 = {
+            x:Math.round((pose1.x-pose2.x)*1000000)/1000000,
+            y:Math.round((pose1.y-pose2.y)*1000000)/1000000,
+            z:Math.round((pose1.z-pose2.z)*1000000)/1000000,
+            visibility:Math.min(pose1.visibility,pose2.visibility),
+        }
+        const vector2 = {
+            x:Math.round((pose3.x-pose2.x)*1000000)/1000000,
+            y:Math.round((pose3.y-pose2.y)*1000000)/1000000,
+            z:Math.round((pose3.z-pose2.z)*1000000)/1000000,
+            visibility:Math.min(pose3.visibility,pose2.visibility),
+        }
+
+        //console.log("arrived vector",vector1,vector2)
+        return {
+            angle: Math.acos((vector1.x * vector2.x + vector1.y * vector2.y + vector1.z * vector2.z) / ( Math.sqrt(vector1.x**2 + vector1.y**2 + vector1.z**2) * Math.sqrt(vector2.x**2 + vector2.y**2 + vector2.z**2))) * 180 / Math.PI,
+            visibility: Math.min(vector1.visibility, vector2.visibility),
+            "vector1":vector1,
+            "vector2":vector2,
+        };
+    }
+
+    //ベクトルを引数とした角度の計算
+    function calcVectorAngle(vector1,vector2){
+      return {
+          angle: Math.acos((vector1.x * vector2.x + vector1.y * vector2.y + vector1.z * vector2.z) / ( Math.sqrt(vector1.x**2 + vector1.y**2 + vector1.z**2) * Math.sqrt(vector2.x**2 + vector2.y**2 + vector2.z**2))) * 180 / Math.PI,
+          visibility: Math.min(vector1.visibility, vector2.visibility),
+          "vector1":vector1,
+          "vector2":vector2,
+      };
+    }
+
+
+
+    //毎フレーム描画する関数
+    function onResults(results) {
+      if (!results.poseLandmarks) {
+        //grid.updateLandmarks([]);
+        return;
+      }
+
+      canvasCtx.save();
+      canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+      /*canvasCtx.drawImage(results.segmentationMask, 0, 0,
+                          canvasElement.width, canvasElement.height);*/
+
+      // Only overwrite existing pixels.
+      canvasCtx.globalCompositeOperation = 'source-in';
+      canvasCtx.fillStyle = '#00FF00';
+      canvasCtx.fillRect(0, 0, canvasElement.width, canvasElement.height);
+
+      // Only overwrite missing pixels.
+      canvasCtx.globalCompositeOperation = 'destination-atop';
+      canvasCtx.drawImage(
+          results.image, 0, 0, canvasElement.width, canvasElement.height);
+
+      canvasCtx.globalCompositeOperation = 'source-over';
+      drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS,
+                     {color: '#00FF00', lineWidth: 4});
+      drawLandmarks(canvasCtx, results.poseLandmarks,
+                    {color: '#FF0000', lineWidth: 2});
+      canvasCtx.restore();
+
+      //ここらへんで自分の関数の処理や音声の再生をしている、描画もやろうと思えばできるよ
+      var resulttxt="<h1>体の角度:"+cameraAngle(results)+"°</h1>";
+      angleElement.innerHTML = resulttxt;
+
+      var Cangle = cameraAngle(results);
+      if(!ongen_sound){
+        if(Cangle < 70 || Cangle > 110){
+          SE["ongen"].currentTime = 0;
+          SE["ongen"].play();
+          ongen_sound = true;
+        }
+      }
+      if(ongen_sound){
+        if(Cangle > 70 && Cangle < 110){
+          ongen_sound = false;
+        }
+      }
+      
+      //grid.updateLandmarks(results.poseWorldLandmarks);
+    }
+
+    const pose = new Pose({locateFile: (file) => {
+      return `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`;
+    }});
+    pose.setOptions({
+      modelComplexity: 1,
+      smoothLandmarks: true,
+      enableSegmentation: true,
+      smoothSegmentation: true,
+      minDetectionConfidence: 0.5,
+      minTrackingConfidence: 0.5
+    });
+
+    pose.onResults(onResults);
+
+
+    const camera = new Camera(videoElement, {
+      onFrame: async () => {
+        await pose.send({image: videoElement});
+      },
+      width: 1280,
+      height: 720
+    });
+    camera.start();
+</script>
