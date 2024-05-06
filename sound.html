@@ -2,6 +2,7 @@
 <html lang = "ja">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils_3d/control_utils_3d.js" crossorigin="anonymous"></script>
@@ -12,14 +13,12 @@
 </head>
 
 <body>
-    <div class="overlay">
-        <div class="btn_area">
-            <p class="ttl">重要なお知らせ</p>
-            <p>本システムはラジオ体操学習支援サイトです</br>
-            </p>
-            <button>ラジ体操を始める</button>
-        </div>
+  <div id="myModal" class="modal">
+    <div class="modal-content">
+        <p>音声を再生するためには許可が必要です。</p>
+        <button id="allowButton">許可する</button>
     </div>
+  </div>
   <div class="container">
     <video hidden class="input_video"></video><!--入力映像-->
     <canvas class="output_canvas" width="1280px" height="720px"></canvas> <!--描画するキャンパス-->
@@ -49,21 +48,43 @@
     width: 72%;
     height:510px;
   }
+  /* モーダルのスタイル */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1; 
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+  .modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    text-align: center;
+    }
   </style>
 </html>
 
 <script type="module">
 
 'use strict';//ストリクトモードの開始
+// モーダルを表示する関数
+function showModal() {
+        var modal = document.getElementById("myModal");
+        modal.style.display = "block";
+    }
 
-$(function () {
-            $(".overlay").show();
-            $(".btn_area button").click(function () {
-                $(".overlay").fadeOut();
-                //document.documentElement.requestFullscreen();
-                allowMusic();
-            });
-        });
+    // ボタンにクリックイベントを追加
+    document.getElementById("allowButton").addEventListener("click", function() {
+        allowMusic();
+        // モーダルを非表示にする
+        document.getElementById("myModal").style.display = "none";
+    });
 
     const videoElement = document.getElementsByClassName('input_video')[0];
     const canvasElement = document.getElementsByClassName('output_canvas')[0];
@@ -245,6 +266,10 @@ $(function () {
       //grid.updateLandmarks(results.poseWorldLandmarks);
     }
 
+    window.onload = function() {
+        showModal();
+    };
+    
     const pose = new Pose({locateFile: (file) => {
       return `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`;
     }});
