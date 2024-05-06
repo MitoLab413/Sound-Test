@@ -328,7 +328,7 @@ function showModal() {
       
       if(Cangle < 70 || Cangle > 110){
         if(!flgAngle){
-            ongen.play();
+            startMusic(ongen, false);
             flgAngle = true;
         }
       }
@@ -338,7 +338,7 @@ function showModal() {
 
       if(flgAngle && results.poseWorldLandmarks[POSE_LANDMARKS.LEFT_ANKLE].visibility > 0.8 && results.poseWorldLandmarks[POSE_LANDMARKS.RIGHT_ANKLE].visibility > 0.8){
           startMusic(guide1, false);
-        }
+      }
       
       
       //grid.updateLandmarks(results.poseWorldLandmarks);
