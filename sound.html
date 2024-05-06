@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang = "ja">
 <head>
   <meta charset="utf-8">
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
@@ -7,6 +7,8 @@
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils_3d/control_utils_3d.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+
 </head>
 
 <body>
@@ -51,15 +53,10 @@
 </html>
 
 <script type="module">
-    const videoElement = document.getElementsByClassName('input_video')[0];
-    const canvasElement = document.getElementsByClassName('output_canvas')[0];
-    const canvasCtx = canvasElement.getContext('2d');
-    const landmarkContainer = document.getElementsByClassName('landmark-grid-container')[0];
-    //const grid = new LandmarkGrid(landmarkContainer);
-    const angleElement = document.getElementById("angle");
 
+'use strict';//ストリクトモードの開始
 
-    $(function () {
+$(function () {
             $(".overlay").show();
             $(".btn_area button").click(function () {
                 $(".overlay").fadeOut();
@@ -68,13 +65,23 @@
             });
         });
 
+    const videoElement = document.getElementsByClassName('input_video')[0];
+    const canvasElement = document.getElementsByClassName('output_canvas')[0];
+    const canvasCtx = canvasElement.getContext('2d');
+    const landmarkContainer = document.getElementsByClassName('landmark-grid-container')[0];
+    //const grid = new LandmarkGrid(landmarkContainer);
+    const angleElement = document.getElementById("angle");
+
+
 
     //効果音
     const ongen = new Audio('ongen.mp3');
+    const announce = new Audio('announce3.mp3');
 
     //効果音を管理するための変数
-    const nowPlay = ongen;
-    var flagMusic = false;
+    let nowPlay = announce;
+    let flgMusic = false;
+    let flgAngle = false;
 
     const resetMusic = (nowPlay) => {
             if (flgMusic) nowPlay.pause();
@@ -220,19 +227,20 @@
       var resulttxt="<h1>体の角度:"+cameraAngle(results)+"°</h1>";
       angleElement.innerHTML = resulttxt;
 
+      allowMusic();
+
       var Cangle = cameraAngle(results);
-      if(!ongen_sound){
-        if(Cangle < 70 || Cangle > 110){
-          SE["ongen"].currentTime = 0;
-          SE["ongen"].play();
-          ongen_sound = true;
+      
+      if(Cangle < 70 || Cangle > 110){
+        if(!flgAngle){
+            startMusic(ongen, false);
+            flgAngle = true;
         }
       }
-      if(ongen_sound){
-        if(Cangle > 70 && Cangle < 110){
-          ongen_sound = false;
-        }
+      if(Cangle > 70 && Cangle < 110){
+        flgAngle = false;
       }
+      
       
       //grid.updateLandmarks(results.poseWorldLandmarks);
     }
