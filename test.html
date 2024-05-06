@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音声再生許可</title>
+    <style>
+        /* モーダルのスタイル */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div id="myModal" class="modal">
+    <div class="modal-content">
+        <p>音声を再生するためには許可が必要です。</p>
+        <button id="allowButton">許可する</button>
+    </div>
+</div>
+
+<button id="playButton" style="display: none;">音声を再生する</button>
+
+<script>
+    // モーダルを表示する関数
+    function showModal() {
+        var modal = document.getElementById("myModal");
+        modal.style.display = "block";
+    }
+
+    const ongen = new Audio('ongen.mp3');
+    
+    // ボタンにクリックイベントを追加
+    document.getElementById("allowButton").addEventListener("click", function() {
+        // モーダルを非表示にする
+        document.getElementById("myModal").style.display = "none";
+        // 音声再生ボタンを表示する
+        document.getElementById("playButton").style.display = "block";
+    });
+
+    // 音声再生ボタンをクリックしたときの処理
+    document.getElementById("playButton").addEventListener("click", function() {
+        ongen.play();
+        // ここに音声再生のコードを追加
+        console.log("音声を再生します。");
+    });
+
+    // ページ読み込み時にモーダルを表示
+    window.onload = function() {
+        showModal();
+    };
+</script>
+
+</body>
+</html>
