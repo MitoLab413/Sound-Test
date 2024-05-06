@@ -45,7 +45,8 @@
     }
 
     const ongen = new Audio('ongen.mp3');
-    
+    const announce = new Audio('announce3.mp3');
+
     // ボタンにクリックイベントを追加
     document.getElementById("allowButton").addEventListener("click", function() {
         // モーダルを非表示にする
@@ -64,6 +65,7 @@
     // ページ読み込み時にモーダルを表示
     window.onload = function() {
         showModal();
+        announce.play();
     };
 </script>
 
