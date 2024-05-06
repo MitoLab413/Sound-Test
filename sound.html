@@ -81,10 +81,10 @@ function showModal() {
 
     // ボタンにクリックイベントを追加
     document.getElementById("allowButton").addEventListener("click", function() {
-      localStorage.setItem("audioPermission", "allowed");
         allowMusic();
         // モーダルを非表示にする
         document.getElementById("myModal").style.display = "none";
+        localStorage.setItem("audioPermission", "allowed");
     });
 
     const videoElement = document.getElementsByClassName('input_video')[0];
