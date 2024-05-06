@@ -81,6 +81,7 @@ function showModal() {
 
     // ボタンにクリックイベントを追加
     document.getElementById("allowButton").addEventListener("click", function() {
+      localStorage.setItem("audioPermission", "allowed");
         allowMusic();
         // モーダルを非表示にする
         document.getElementById("myModal").style.display = "none";
@@ -269,7 +270,7 @@ function showModal() {
     window.onload = function() {
         showModal();
     };
-    
+
     const pose = new Pose({locateFile: (file) => {
       return `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`;
     }});
