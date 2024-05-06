@@ -49,6 +49,7 @@
 
     // ボタンにクリックイベントを追加
     document.getElementById("allowButton").addEventListener("click", function() {
+        announce.play();
         // モーダルを非表示にする
         document.getElementById("myModal").style.display = "none";
         // 音声再生ボタンを表示する
@@ -65,7 +66,6 @@
     // ページ読み込み時にモーダルを表示
     window.onload = function() {
         showModal();
-        announce.play();
     };
 </script>
 
