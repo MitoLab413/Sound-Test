@@ -44,7 +44,7 @@
   .modal {
     display: none;
     position: fixed;
-    z-index: 1; 
+    z-index: 1;
     left: 0;
     top: 0;
     width: 100%;
@@ -115,6 +115,7 @@ function showModal() {
         const allowMusic = () => {
             if (!flgMusic) nowPlay.play();
             flgMusic = true;
+            ongen.load();
         }
         /**
          * 音楽の関数
@@ -203,7 +204,7 @@ function showModal() {
       const right_ankle = pL[POSE_LANDMARKS.RIGHT_ANKLE];
       const left_knee = pL[POSE_LANDMARKS.LEFT_KNEE];
       const left_ankle = pL[POSE_LANDMARKS.LEFT_ANKLE];
-      
+
       var is_stretch =  (calcAngle(right_shoulder,right_elbow,right_wrist).angle>=140)&&(calcAngle(left_shoulder,left_elbow,left_wrist).angle>=140);//腕を伸ばしているかどうか
       var is_down = (calcAngle(left_hip, left_shoulder, left_elbow).angle <= 40)&&(calcAngle(right_hip, right_shoulder, right_elbow).angle <= 40);
       var legs_stretch = (calcAngle(right_hip, right_knee, right_ankle).angle >= 150)&&(calcAngle(left_hip, left_knee, left_ankle).angle >= 150);
@@ -325,7 +326,7 @@ function showModal() {
 
 
       var Cangle = cameraAngle(results);
-      
+
       if(Cangle < 70 || Cangle > 110){
         if(!flgAngle){
             startMusic(ongen, false);
@@ -339,8 +340,8 @@ function showModal() {
       /*if(flgAngle && results.poseWorldLandmarks[POSE_LANDMARKS.LEFT_ANKLE].visibility > 0.8 && results.poseWorldLandmarks[POSE_LANDMARKS.RIGHT_ANKLE].visibility > 0.8){
           startMusic(guide1, false);
       }*/
-      
-      
+
+
       //grid.updateLandmarks(results.poseWorldLandmarks);
     }
 
