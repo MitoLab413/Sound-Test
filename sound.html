@@ -92,6 +92,7 @@ function showModal() {
     const ongen = new Audio('SE/ongen.mp3');
     const announce = new Audio('SE/instruction1.mp3');
     const guide1 = new Audio('SE/guide1.mp3');
+    const radio = new Audio('SE/dario_using.mp3');
 
     //効果音を管理するための変数
     let nowPlay = announce;
@@ -115,8 +116,8 @@ function showModal() {
         const allowMusic = () => {
             if (!flgMusic) nowPlay.play();
             flgMusic = true;
-            ongen.load();
-            guide1.load();
+            radio.load();
+            //guide1.load();
         }
         /**
          * 音楽の関数
@@ -330,7 +331,7 @@ function showModal() {
 
       if(Cangle < 70 || Cangle > 110){
         if(!flgAngle){
-            startMusic(ongen, false);
+            startMusic(radio, false);
             flgAngle = true;
         }
       }
@@ -338,9 +339,9 @@ function showModal() {
         flgAngle = false;
       }
 
-      if(!flgAngle && results.poseWorldLandmarks[POSE_LANDMARKS.LEFT_ANKLE].visibility > 0.8 && results.poseWorldLandmarks[POSE_LANDMARKS.RIGHT_ANKLE].visibility > 0.8){
+      /*if(!flgAngle && results.poseWorldLandmarks[POSE_LANDMARKS.LEFT_ANKLE].visibility > 0.8 && results.poseWorldLandmarks[POSE_LANDMARKS.RIGHT_ANKLE].visibility > 0.8){
           startMusic(guide1, false);
-      }
+      }*/
 
 
       //grid.updateLandmarks(results.poseWorldLandmarks);
