@@ -116,6 +116,7 @@ function showModal() {
             if (!flgMusic) nowPlay.play();
             flgMusic = true;
             ongen.load();
+            guide1.load();
         }
         /**
          * 音楽の関数
@@ -337,9 +338,9 @@ function showModal() {
         flgAngle = false;
       }
 
-      /*if(flgAngle && results.poseWorldLandmarks[POSE_LANDMARKS.LEFT_ANKLE].visibility > 0.8 && results.poseWorldLandmarks[POSE_LANDMARKS.RIGHT_ANKLE].visibility > 0.8){
+      if(flgAngle && results.poseWorldLandmarks[POSE_LANDMARKS.LEFT_ANKLE].visibility > 0.8 && results.poseWorldLandmarks[POSE_LANDMARKS.RIGHT_ANKLE].visibility > 0.8){
           startMusic(guide1, false);
-      }*/
+      }
 
 
       //grid.updateLandmarks(results.poseWorldLandmarks);
