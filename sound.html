@@ -300,12 +300,12 @@ function showModal() {
         return;
       }
 
-      /*canvasCtx.save();
+      canvasCtx.save();
       canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
       /*canvasCtx.drawImage(results.segmentationMask, 0, 0,
                           canvasElement.width, canvasElement.height);*/
 
-      /* Only overwrite existing pixels.
+      //Only overwrite existing pixels.
       canvasCtx.globalCompositeOperation = 'source-in';
       canvasCtx.fillStyle = '#00FF00';
       canvasCtx.fillRect(0, 0, canvasElement.width, canvasElement.height);
@@ -316,11 +316,11 @@ function showModal() {
           results.image, 0, 0, canvasElement.width, canvasElement.height);
 
       canvasCtx.globalCompositeOperation = 'source-over';
-      drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS,
-                     {color: '#00FF00', lineWidth: 4});
-      drawLandmarks(canvasCtx, results.poseLandmarks,
-                    {color: '#FF0000', lineWidth: 2});
-      canvasCtx.restore();*/
+      //drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS,
+        //             {color: '#00FF00', lineWidth: 4});
+      //drawLandmarks(canvasCtx, results.poseLandmarks,
+        //            {color: '#FF0000', lineWidth: 2});
+      canvasCtx.restore();
 
       //ここらへんで自分の関数の処理や音声の再生をしている、描画もやろうと思えばできるよ
       var resulttxt="<h1>体の角度:"+cameraAngle(results)+"°</h1>";
